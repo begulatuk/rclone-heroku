@@ -4,25 +4,41 @@ indent() {
   sed -u 's/^/       /'
 }
 
-echo "-----> Install rclone"
+
+echo "-----> Installing Fclone"
 BUILD_DIR=$1
+CACHE_DIR=$2
 VENDOR_DIR="vendor"
-FILE="fclone-v0.3.1-freebsd-amd64"
+FILE="fclone-v0.3.1-freebsd-amd64.zip"
 DOWNLOAD_URL="https://github.com/mawaya/rclone/releases/download/fclone-v0.3.1/fclone-v0.3.1-freebsd-amd64.zip"
 
-echo "DOWNLOAD_URL = " $DOWNLOAD_URL | indent
+mkdir -p "$CACHE_DIR"
 
-cd $BUILD_DIR
-mkdir -p $VENDOR_DIR
-cd $VENDOR_DIR
+if ! [ -e "$CACHE_DIR/$FILE" ]; then
+  echo "-----> Fetching Latest Fclone binaries from Nenokkadine" | indent
+  wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
+else
+  filestr=$(find . -name "$CACHE_DIR/$FILE" -mtime +1 -print)
+  if [ "$filestr" = "" ]; then
+    echo "-----> cache Expired, Fetching Latest Fclone from Nenokkadine" | indent
+    wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
+  else
+    echo "build using cached source"  | indent
+  fi
+fi
+
+cd "$BUILD_DIR"
+mkdir -p "$VENDOR_DIR"
+cd "$VENDOR_DIR"
 mkdir -p fclone
 cd fclone
-wget -q $DOWNLOAD_URL
-unzip -qqj $FILE.zip
-rm -rf $FILE.zip
+cp "$CACHE_DIR/$FILE" .
+unzip -qqj "$FILE"
+rm -rf "$FILE"
 chmod 777 fclone
 
 echo "exporting PATH" | indent
-PROFILE_PATH="$BUILD_DIR/.profile.d/rclone.sh"
-mkdir -p $(dirname $PROFILE_PATH)
+PROFILE_PATH="$BUILD_DIR/.profile.d/fclone.sh"
+mkdir -p "$(dirname "$PROFILE_PATH")"
 echo 'export PATH="$PATH:${HOME}/vendor/fclone"' >> $PROFILE_PATH
+echo "Fclone by Nenokkadine installed"  | indent
