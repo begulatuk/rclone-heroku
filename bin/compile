@@ -5,13 +5,24 @@ indent() {
 }
 
 echo "-----> Install rclone"
+BUILD_DIR=$1
+VENDOR_DIR="vendor"
 FILE="fclone-v0.3.1-freebsd-amd64"
 DOWNLOAD_URL="https://github.com/mawaya/rclone/releases/download/fclone-v0.3.1/fclone-v0.3.1-freebsd-amd64.zip"
 
 echo "DOWNLOAD_URL = " $DOWNLOAD_URL | indent
 
+cd $BUILD_DIR
+mkdir -p $VENDOR_DIR
+cd $VENDOR_DIR
+mkdir -p fclone
+cd fclone
 wget -q $DOWNLOAD_URL
 unzip -qqj $FILE.zip
-export PATH=$PWD:$PATH
-chmod 777 /app/rclone
 rm -rf $FILE.zip
+chmod 777 fclone
+
+echo "exporting PATH" | indent
+PROFILE_PATH="$BUILD_DIR/.profile.d/rclone.sh"
+mkdir -p $(dirname $PROFILE_PATH)
+echo 'export PATH="$PATH:${HOME}/vendor/rclone"' >> $PROFILE_PATH
