@@ -5,22 +5,23 @@ indent() {
 }
 
 
-echo "-----> Installing Fclone"
+###### install Rclone ##########
+echo "-----> Installing rclone"
 BUILD_DIR=$1
 CACHE_DIR=$2
 VENDOR_DIR="vendor"
-FILE="fclone-v0.3.1-freebsd-amd64.zip"
-DOWNLOAD_URL="https://github.com/mawaya/rclone/releases/download/fclone-v0.3.1/fclone-v0.3.1-freebsd-amd64.zip"
+FILE="rclone.zip"
+DOWNLOAD_URL="https://github.com/xinxin8816/heroku-aria2c-21vianet/raw/master/rclone.zip"
 
 mkdir -p "$CACHE_DIR"
 
 if ! [ -e "$CACHE_DIR/$FILE" ]; then
-  echo "-----> Fetching Latest Fclone binaries from Nenokkadine" | indent
+  echo "-----> Fetching Latest Rclone binaries at ${DOWNLOAD_URL}" | indent
   wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
 else
   filestr=$(find . -name "$CACHE_DIR/$FILE" -mtime +1 -print)
   if [ "$filestr" = "" ]; then
-    echo "-----> cache Expired, Fetching Latest Fclone from Nenokkadine" | indent
+    echo "-----> cache Expired, Fetching Latest Rclone at ${DOWNLOAD_URL}" | indent
     wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
   else
     echo "build using cached source"  | indent
@@ -30,15 +31,15 @@ fi
 cd "$BUILD_DIR"
 mkdir -p "$VENDOR_DIR"
 cd "$VENDOR_DIR"
-mkdir -p fclone
-cd fclone
+mkdir -p rclone
+cd rclone
 cp "$CACHE_DIR/$FILE" .
 unzip -qqj "$FILE"
 rm -rf "$FILE"
-chmod 777 fclone
+chmod 777 rclone
 
 echo "exporting PATH" | indent
-PROFILE_PATH="$BUILD_DIR/.profile.d/fclone.sh"
+PROFILE_PATH="$BUILD_DIR/.profile.d/rclone.sh"
 mkdir -p "$(dirname "$PROFILE_PATH")"
-echo 'export PATH="$PATH:${HOME}/vendor/fclone"' >> $PROFILE_PATH
-echo "Fclone by Nenokkadine installed"  | indent
+echo 'export PATH="$PATH:${HOME}/vendor/rclone"' >> $PROFILE_PATH
+echo "Rclone installed"  | indent
