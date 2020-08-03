@@ -8,38 +8,22 @@ indent() {
 ###### install Rclone ##########
 echo "-----> Installing rclone"
 BUILD_DIR=$1
-CACHE_DIR=$2
 VENDOR_DIR="vendor"
-FILE="rclone.zip"
+FILE="rclone"
 DOWNLOAD_URL="https://github.com/xinxin8816/heroku-aria2c-21vianet/raw/master/rclone.zip"
 
-mkdir -p "$CACHE_DIR"
+echo "DOWNLOAD_URL = " $DOWNLOAD_URL | indent
 
-if ! [ -e "$CACHE_DIR/$FILE" ]; then
-  echo "-----> Fetching Latest Rclone binaries at ${DOWNLOAD_URL}" | indent
-  wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
-else
-  filestr=$(find . -name "$CACHE_DIR/$FILE" -mtime +1 -print)
-  if [ "$filestr" = "" ]; then
-    echo "-----> cache Expired, Fetching Latest Rclone at ${DOWNLOAD_URL}" | indent
-    wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
-  else
-    echo "build using cached source"  | indent
-  fi
-fi
-
-cd "$BUILD_DIR"
-mkdir -p "$VENDOR_DIR"
-cd "$VENDOR_DIR"
+cd $BUILD_DIR
+mkdir -p $VENDOR_DIR
+cd $VENDOR_DIR
 mkdir -p rclone
 cd rclone
-cp "$CACHE_DIR/$FILE" .
-unzip -qqj "$FILE"
-rm -rf "$FILE"
-chmod 777 rclone
+wget -q $DOWNLOAD_URL
+unzip -qqj $FILE.zip
+rm -rf $FILE.zip
 
 echo "exporting PATH" | indent
 PROFILE_PATH="$BUILD_DIR/.profile.d/rclone.sh"
-mkdir -p "$(dirname "$PROFILE_PATH")"
+mkdir -p $(dirname $PROFILE_PATH)
 echo 'export PATH="$PATH:${HOME}/vendor/rclone"' >> $PROFILE_PATH
-echo "Rclone installed"  | indent
